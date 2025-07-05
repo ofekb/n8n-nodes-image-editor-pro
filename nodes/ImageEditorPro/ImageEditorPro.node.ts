@@ -4,7 +4,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeOperationError,
-    NodeConnectionType
+	NodeConnectionType,
 } from 'n8n-workflow';
 import { imageEditor } from './ImageEditorPro.utils';
 import {
@@ -26,8 +26,8 @@ export class ImageEditorPro implements INodeType {
 		defaults: {
 			name: 'ImageEditorPro',
 		},
-        inputs: ['main' as NodeConnectionType],
-		outputs: ['main' as NodeConnectionType],       
+		inputs: ['main' as NodeConnectionType],
+		outputs: ['main' as NodeConnectionType],
 		codex: {
 			categories: ['Image Processing'],
 		},
@@ -50,6 +50,7 @@ export class ImageEditorPro implements INodeType {
 				default: '',
 				placeholder: 'https://example.com/image1.png,https://example.com/image2.jpg',
 			},
+
 			// Collage options
 			{
 				displayName: 'Rows',
@@ -79,7 +80,8 @@ export class ImageEditorPro implements INodeType {
 				default: '#ffffff',
 				displayOptions: { show: { mode: ['collage'] } },
 			},
-			// Add text options
+
+			// Add Text options
 			{
 				displayName: 'Text',
 				name: 'text',
@@ -100,6 +102,32 @@ export class ImageEditorPro implements INodeType {
 				type: 'color',
 				default: '#000000',
 				displayOptions: { show: { mode: ['addText'] } },
+			},
+			{
+				displayName: 'Text Background Shape',
+				name: 'textBackgroundShape',
+				type: 'options',
+				options: [
+					{ name: 'None', value: 'none' },
+					{ name: 'Circle', value: 'circle' },
+					{ name: 'Rectangle', value: 'rectangle' },
+				],
+				default: 'none',
+				displayOptions: { show: { mode: ['addText'] } },
+			},
+			{
+				displayName: 'Text Background Color',
+				name: 'textBackgroundColor',
+				type: 'color',
+				default: '#ffffff',
+				displayOptions: { show: { mode: ['addText'], textBackgroundShape: ['circle', 'rectangle'] } },
+			},
+			{
+				displayName: 'Text Border Color',
+				name: 'textBorderColor',
+				type: 'color',
+				default: '#000000',
+				displayOptions: { show: { mode: ['addText'], textBackgroundShape: ['circle', 'rectangle'] } },
 			},
 			{
 				displayName: 'Position',
@@ -139,7 +167,8 @@ export class ImageEditorPro implements INodeType {
 				},
 				displayOptions: { show: { mode: ['addText', 'addWatermark'] } },
 			},
-			// Watermark
+
+			// Watermark options
 			{
 				displayName: 'Watermark Text',
 				name: 'watermarkText',
@@ -187,6 +216,9 @@ export class ImageEditorPro implements INodeType {
 				color: this.getNodeParameter('color', 0) as string,
 				position,
 				opacity: this.getNodeParameter('opacity', 0) as number,
+				backgroundShape: this.getNodeParameter('textBackgroundShape', 0) as any,
+				backgroundColor: this.getNodeParameter('textBackgroundColor', 0) as string,
+				borderColor: this.getNodeParameter('textBorderColor', 0) as string,
 			};
 		} else {
 			const positionParam = this.getNodeParameter('position', 0) as string;
@@ -194,6 +226,7 @@ export class ImageEditorPro implements INodeType {
 				positionParam === 'custom'
 					? { x: this.getNodeParameter('customX', 0) as number, y: this.getNodeParameter('customY', 0) as number }
 					: (positionParam as AddWatermarkOptions['position']);
+
 			options = {
 				content: this.getNodeParameter('watermarkText', 0) as string,
 				position,

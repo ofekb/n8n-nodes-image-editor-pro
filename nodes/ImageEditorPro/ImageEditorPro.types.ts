@@ -14,18 +14,32 @@ export interface CollageOptions {
 	backgroundColor: string;
 }
 
-export interface AddTextOptions {
-	text: string;
-	fontSize: number;
-	color: string;
-	position: 'top-left' | 'center' | 'bottom-right' | { x: number; y: number };
-	opacity?: number;
-}
+export type Position =
+	| 'top-left'
+	| 'center'
+	| 'bottom-right'
+	| {
+			x: number;
+			y: number;
+	  };
+
+	  export interface AddTextOptions {
+		text: string;
+		fontSize: number;
+		color: string;
+		position: 'top-left' | 'center' | 'bottom-right' | { x: number; y: number };
+		opacity: number;
+		backgroundShape?: 'circle' | 'rectangle' | 'square' | 'none';
+		backgroundColor?: string;
+		borderColor?: string;
+		borderWidth?: number;
+	}
+	
 
 export interface AddWatermarkOptions {
 	content: string;
-	position: AddTextOptions['position'];
-	opacity?: number;
+	position: Position;
+	opacity: number;
 }
 
 export type ImageEditorOptions = CollageOptions | AddTextOptions | AddWatermarkOptions;

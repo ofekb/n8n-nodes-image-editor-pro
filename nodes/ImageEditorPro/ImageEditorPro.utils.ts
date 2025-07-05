@@ -21,12 +21,10 @@ export async function imageEditor({
 }): Promise<Buffer> {
 	const images: Buffer[] = [];
 
-	// Handle image input from binary
 	if (input.binary) {
 		images.push(Buffer.from(input.binary.data, 'base64'));
 	}
 
-	// Handle image input from URLs
 	for (const url of input.urls ?? []) {
 		const res = await axios.get(url, { responseType: 'arraybuffer' });
 		images.push(Buffer.from(res.data));
@@ -65,11 +63,9 @@ async function createCollage(images: Buffer[], opts: CollageOptions): Promise<Bu
 		for (let col = 0; col < columns; col++) {
 			if (index >= images.length) break;
 
-			const img = await loadImage(await sharp(images[index])
-				.resize(thumbWidth, thumbHeight)
-				.png()
-				.toBuffer());
-
+			const img = await loadImage(
+				await sharp(images[index]).resize(thumbWidth, thumbHeight).png().toBuffer()
+			);
 			ctx.drawImage(img, col * (thumbWidth + spacing), row * (thumbHeight + spacing));
 			index++;
 		}
@@ -85,11 +81,9 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
-
 	ctx.drawImage(loadedImg, 0, 0);
 
 	ctx.globalAlpha = opts.opacity ?? 1;
-	ctx.fillStyle = opts.color;
 	ctx.font = `${opts.fontSize}px sans-serif`;
 
 	let x = 0;
@@ -119,15 +113,37 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 		y = opts.position.y;
 	}
 
-	// Draw background circle
+
 	const padding = 20;
 	const radius = opts.fontSize + padding;
-	ctx.beginPath();
-	ctx.arc(x, y - opts.fontSize / 2, radius, 0, Math.PI * 2);
-	ctx.fillStyle = 'rgba(255,255,255,0.5)';
-	ctx.fill();
+	const bgColor = opts.backgroundColor || 'rgba(255,255,255,0.5)';
+	const borderWidth = opts.borderWidth ?? 0;
+	const borderColor = opts.borderColor || 'transparent';
 
-	// Draw text
+	if (opts.backgroundShape === 'circle') {
+		ctx.beginPath();
+		ctx.arc(x, y - opts.fontSize / 2, radius, 0, Math.PI * 2);
+		ctx.fillStyle = bgColor;
+		ctx.fill();
+		if (borderWidth > 0) {
+			ctx.lineWidth = borderWidth;
+			ctx.strokeStyle = borderColor;
+			ctx.stroke();
+		}
+	} else if (opts.backgroundShape === 'square') {
+		const boxWidth = ctx.measureText(opts.text).width + padding;
+		const boxHeight = opts.fontSize + padding;
+		const boxX = x - boxWidth / 2;
+		const boxY = y - opts.fontSize / 2 - padding / 2;
+
+		ctx.fillStyle = bgColor;
+		ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+		if (borderWidth > 0) {
+			ctx.lineWidth = borderWidth;
+			ctx.strokeStyle = borderColor;
+			ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+		}
+	}
 	ctx.fillStyle = opts.color;
 	ctx.globalAlpha = opts.opacity ?? 1;
 	ctx.fillText(opts.text, x, y);
@@ -136,7 +152,6 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 }
 
 async function addWatermark(image: Buffer, opts: AddWatermarkOptions): Promise<Buffer> {
-	// For now, only text watermark
 	return addText(image, {
 		text: opts.content,
 		color: '#000000',
