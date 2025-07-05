@@ -19,8 +19,7 @@
     "prepublishOnly": "npm run build",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "postinstall": "cd node_modules/canvas && npm install --build-from-source"
+    "lintfix": "eslint nodes credentials package.json --fix"
   },
   "n8n": {
     "n8nNodesApiVersion": 1,
