@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-image-editor-pro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Advanced image editing node for n8n using Sharp and Canvas",
   "main": "dist/index.js",
   "scripts": {
