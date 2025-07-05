@@ -15,6 +15,11 @@
     "canvas",
     "sharp"
   ],
+  "n8n": {
+    "nodes": [
+      "nodes/ImageEditorPro/ImageEditorPro.node.ts"
+    ]
+  },
   "author": "Ofek Ben Harosh",
   "license": "MIT",
   "homepage": "https://github.com/ofekb/n8n-nodes-image-editor-pro",

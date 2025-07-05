@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImageEditorPro = void 0;
+const n8n_workflow_1 = require("n8n-workflow");
 const ImageEditorPro_utils_1 = require("./ImageEditorPro.utils");
 class ImageEditorPro {
     constructor() {
@@ -9,14 +10,15 @@ class ImageEditorPro {
             name: 'imageEditorPro',
             group: ['transform'],
             version: 1,
-            description: 'Advanced image processing node using Sharp and Canvas',
+            description: 'Advanced image editing: collage, text overlay, watermark',
             defaults: {
                 name: 'ImageEditorPro',
             },
             inputs: ['main'],
             outputs: ['main'],
-            icon: 'fa:image',
-            category: 'Image Processing',
+            codex: {
+                categories: ['Image Processing'],
+            },
             properties: [
                 {
                     displayName: 'Mode',
@@ -34,7 +36,7 @@ class ImageEditorPro {
                     name: 'imageUrls',
                     type: 'string',
                     default: '',
-                    placeholder: 'Comma-separated URLs',
+                    placeholder: 'https://example.com/image1.png,https://example.com/image2.jpg',
                 },
                 // Collage options
                 {
@@ -42,230 +44,152 @@ class ImageEditorPro {
                     name: 'rows',
                     type: 'number',
                     default: 2,
-                    displayOptions: {
-                        show: {
-                            mode: ['collage'],
-                        },
-                    },
+                    displayOptions: { show: { mode: ['collage'] } },
                 },
                 {
                     displayName: 'Columns',
                     name: 'columns',
                     type: 'number',
                     default: 2,
-                    displayOptions: {
-                        show: {
-                            mode: ['collage'],
-                        },
-                    },
+                    displayOptions: { show: { mode: ['collage'] } },
                 },
                 {
                     displayName: 'Spacing',
                     name: 'spacing',
                     type: 'number',
-                    default: 0,
-                    displayOptions: {
-                        show: {
-                            mode: ['collage'],
-                        },
-                    },
+                    default: 10,
+                    displayOptions: { show: { mode: ['collage'] } },
                 },
                 {
                     displayName: 'Background Color',
                     name: 'backgroundColor',
-                    type: 'string',
+                    type: 'color',
                     default: '#ffffff',
-                    displayOptions: {
-                        show: {
-                            mode: ['collage'],
-                        },
-                    },
+                    displayOptions: { show: { mode: ['collage'] } },
                 },
-                // Add Text
+                // Add text options
                 {
                     displayName: 'Text',
                     name: 'text',
                     type: 'string',
-                    default: '',
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
-                    },
+                    default: 'Sample',
+                    displayOptions: { show: { mode: ['addText'] } },
                 },
                 {
                     displayName: 'Font Size',
                     name: 'fontSize',
                     type: 'number',
-                    default: 32,
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
-                    },
+                    default: 48,
+                    displayOptions: { show: { mode: ['addText'] } },
                 },
                 {
                     displayName: 'Text Color',
                     name: 'color',
-                    type: 'string',
-                    default: '#ffffff',
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
-                    },
+                    type: 'color',
+                    default: '#000000',
+                    displayOptions: { show: { mode: ['addText'] } },
                 },
                 {
-                    displayName: 'Text Opacity',
-                    name: 'opacity',
-                    type: 'number',
-                    default: 1,
-                    displayOptions: {
-                        show: {
-                            mode: ['addText', 'addWatermark'],
-                        },
-                    },
-                },
-                {
-                    displayName: 'Text Position',
+                    displayName: 'Position',
                     name: 'position',
                     type: 'options',
                     options: [
                         { name: 'Top Left', value: 'top-left' },
                         { name: 'Center', value: 'center' },
-                        { name: 'Bottom Right', value: 'bottom-right' }
+                        { name: 'Bottom Right', value: 'bottom-right' },
+                        { name: 'Custom', value: 'custom' },
                     ],
-                    default: 'top-left',
-                    displayOptions: {
-                        show: {
-                            mode: ['addText', 'addWatermark'],
-                        },
-                    },
+                    default: 'center',
+                    displayOptions: { show: { mode: ['addText', 'addWatermark'] } },
                 },
                 {
-                    displayName: 'Background Color',
-                    name: 'backgroundColor',
-                    type: 'string',
-                    default: '#000000',
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
-                    },
-                },
-                {
-                    displayName: 'Shape',
-                    name: 'shape',
-                    type: 'options',
-                    options: [
-                        { name: 'Rectangle', value: 'rectangle' },
-                        { name: 'Circle', value: 'circle' },
-                    ],
-                    default: 'circle',
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
-                    },
-                },
-                {
-                    displayName: 'Padding',
-                    name: 'padding',
+                    displayName: 'Custom X',
+                    name: 'customX',
                     type: 'number',
-                    default: 10,
-                    displayOptions: {
-                        show: {
-                            mode: ['addText'],
-                        },
+                    default: 50,
+                    displayOptions: { show: { position: ['custom'] } },
+                },
+                {
+                    displayName: 'Custom Y',
+                    name: 'customY',
+                    type: 'number',
+                    default: 50,
+                    displayOptions: { show: { position: ['custom'] } },
+                },
+                {
+                    displayName: 'Opacity',
+                    name: 'opacity',
+                    type: 'number',
+                    default: 1,
+                    typeOptions: {
+                        minValue: 0,
+                        maxValue: 1,
                     },
+                    displayOptions: { show: { mode: ['addText', 'addWatermark'] } },
                 },
                 // Watermark
                 {
-                    displayName: 'Watermark Type',
-                    name: 'watermarkType',
-                    type: 'options',
-                    options: [
-                        { name: 'Text', value: 'text' },
-                        { name: 'Image', value: 'image' },
-                    ],
-                    default: 'text',
-                    displayOptions: {
-                        show: {
-                            mode: ['addWatermark'],
-                        },
-                    },
-                },
-                {
-                    displayName: 'Content',
-                    name: 'content',
+                    displayName: 'Watermark Text',
+                    name: 'watermarkText',
                     type: 'string',
-                    default: '',
-                    displayOptions: {
-                        show: {
-                            mode: ['addWatermark'],
-                        },
-                    },
+                    default: '© n8n',
+                    displayOptions: { show: { mode: ['addWatermark'] } },
                 },
             ],
         };
     }
     async execute() {
         const mode = this.getNodeParameter('mode', 0);
-        const imageUrlsRaw = this.getNodeParameter('imageUrls', 0, '');
-        const imageUrls = imageUrlsRaw.split(',').map(url => url.trim()).filter(Boolean);
-        const inputBinary = this.getInputData().map(item => item.binary?.imageInput?.data).filter(Boolean);
-        const inputImages = await Promise.all(inputBinary.map(data => this.helpers.binaryToBuffer({ data: data })));
-        let urlsBuffers = [];
-        if (imageUrls.length > 0) {
-            urlsBuffers = await (0, ImageEditorPro_utils_1.downloadImages)(imageUrls);
+        const imageUrlsStr = this.getNodeParameter('imageUrls', 0);
+        const urls = imageUrlsStr
+            .split(',')
+            .map((u) => u.trim())
+            .filter(Boolean);
+        const binary = this.getInputData().find((item) => item.binary?.imageInput)?.binary?.imageInput;
+        if (!urls.length && !binary) {
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Must provide either imageUrls or binary imageInput.');
         }
-        const allImages = [...inputImages, ...urlsBuffers];
-        if (allImages.length === 0) {
-            throw new Error('No image input provided (binary or URLs).');
-        }
-        let output;
+        const input = { urls, binary };
+        let options;
         if (mode === 'collage') {
-            const options = {
-                rows: this.getNodeParameter('rows', 0, 2),
-                columns: this.getNodeParameter('columns', 0, 2),
-                spacing: this.getNodeParameter('spacing', 0, 0),
-                backgroundColor: this.getNodeParameter('backgroundColor', 0, '#ffffff'),
+            options = {
+                rows: this.getNodeParameter('rows', 0),
+                columns: this.getNodeParameter('columns', 0),
+                spacing: this.getNodeParameter('spacing', 0),
+                backgroundColor: this.getNodeParameter('backgroundColor', 0),
             };
-            output = await (0, ImageEditorPro_utils_1.createCollage)(allImages, options);
         }
         else if (mode === 'addText') {
-            const image = allImages[0];
-            const options = {
+            const positionParam = this.getNodeParameter('position', 0);
+            const position = positionParam === 'custom'
+                ? { x: this.getNodeParameter('customX', 0), y: this.getNodeParameter('customY', 0) }
+                : positionParam;
+            options = {
                 text: this.getNodeParameter('text', 0),
                 fontSize: this.getNodeParameter('fontSize', 0),
                 color: this.getNodeParameter('color', 0),
-                position: this.getNodeParameter('position', 0),
-                opacity: this.getNodeParameter('opacity', 0),
-                backgroundColor: this.getNodeParameter('backgroundColor', 0),
-                shape: this.getNodeParameter('shape', 0),
-                padding: this.getNodeParameter('padding', 0),
-            };
-            output = await (0, ImageEditorPro_utils_1.addTextToImage)(image, options);
-        }
-        else if (mode === 'addWatermark') {
-            const image = allImages[0];
-            const options = {
-                type: this.getNodeParameter('watermarkType', 0),
-                content: this.getNodeParameter('content', 0),
-                position: this.getNodeParameter('position', 0),
+                position,
                 opacity: this.getNodeParameter('opacity', 0),
             };
-            output = await (0, ImageEditorPro_utils_1.addWatermark)(image, options);
         }
         else {
-            throw new Error(`Unsupported mode: ${mode}`);
+            const positionParam = this.getNodeParameter('position', 0);
+            const position = positionParam === 'custom'
+                ? { x: this.getNodeParameter('customX', 0), y: this.getNodeParameter('customY', 0) }
+                : positionParam;
+            options = {
+                content: this.getNodeParameter('watermarkText', 0),
+                position,
+                opacity: this.getNodeParameter('opacity', 0),
+            };
         }
+        const buffer = await (0, ImageEditorPro_utils_1.imageEditor)({ mode, input, options });
         return [
             [
                 {
                     json: {},
                     binary: {
-                        data: await this.helpers.prepareBinaryData(output, 'image.png', 'image/png'),
+                        data: await this.helpers.prepareBinaryData(buffer, 'output.png', 'image/png'),
                     },
                 },
             ],
