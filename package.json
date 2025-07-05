@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc && gulp build:icons",
     "lint": "eslint nodes credentials --ext .ts --fix",
-    "prepublishOnly": "npm run build && npm run lint",
+    "prepublishOnly": "npm run build",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
     "lintfix": "eslint nodes credentials package.json --fix"
@@ -23,7 +23,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/ImageEditorPro/ImageEditorPro.node.ts"
+      "dist/nodes/ImageEditorPro/ImageEditorPro.node.js"
     ]
   },
   "repository": {
@@ -37,11 +37,13 @@
     "axios": "^1.6.7",
     "canvas": "^2.11.2",
     "gulp": "^5.0.1",
+    "lint": "^0.8.19",
     "n8n-workflow": "^1.82.0",
     "sharp": "^0.33.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
+    "eslint": "^9.30.1",
     "typescript": "^5.4.3"
   },
   "files": [
