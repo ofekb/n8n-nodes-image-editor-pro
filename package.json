@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-image-editor-pro",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Advanced image editing node for n8n using Sharp and Canvas",
   "keywords": [
     "n8n-community-node-package",
@@ -46,8 +46,11 @@
     "typescript": "^5.4.3",
     "n8n-workflow": "^1.82.0"
   },
+  "peerDependencies": {
+    "n8n-core": "^0.245.0",
+    "n8n-workflow": "^0.245.0"
+  },
   "files": [
-    "dist",
-    "nodes"
+    "dist"
   ]
 }
