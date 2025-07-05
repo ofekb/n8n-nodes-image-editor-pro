@@ -115,35 +115,47 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 
 
 	const padding = 20;
-	const radius = opts.fontSize + padding;
+    const shapeWidth = opts.shapeWidth ?? ctx.measureText(opts.text).width + padding;
+    const shapeHeight = opts.shapeHeight ?? opts.fontSize + padding;
+    const radius = Math.max(shapeWidth, shapeHeight) / 2;
 	const bgColor = opts.backgroundColor || 'rgba(255,255,255,0.5)';
 	const borderWidth = opts.borderWidth ?? 0;
 	const borderColor = opts.borderColor || 'transparent';
 
 	if (opts.backgroundShape === 'circle') {
-		ctx.beginPath();
-		ctx.arc(x, y - opts.fontSize / 2, radius, 0, Math.PI * 2);
-		ctx.fillStyle = bgColor;
-		ctx.fill();
-		if (borderWidth > 0) {
-			ctx.lineWidth = borderWidth;
-			ctx.strokeStyle = borderColor;
-			ctx.stroke();
-		}
+        ctx.beginPath();
+        ctx.arc(x, y - opts.fontSize / 2, radius, 0, Math.PI * 2);
+        ctx.fillStyle = bgColor;
+        ctx.fill();
+        if (borderWidth > 0) {
+            ctx.lineWidth = borderWidth;
+            ctx.strokeStyle = borderColor;
+            ctx.stroke();
+        }        
 	} else if (opts.backgroundShape === 'square') {
-		const boxWidth = ctx.measureText(opts.text).width + padding;
-		const boxHeight = opts.fontSize + padding;
-		const boxX = x - boxWidth / 2;
-		const boxY = y - opts.fontSize / 2 - padding / 2;
-
-		ctx.fillStyle = bgColor;
-		ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-		if (borderWidth > 0) {
-			ctx.lineWidth = borderWidth;
-			ctx.strokeStyle = borderColor;
-			ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-		}
-	}
+        const boxX = x - shapeWidth / 2;
+        const boxY = y - shapeHeight / 2;
+        
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
+        if (borderWidth > 0) {
+            ctx.lineWidth = borderWidth;
+            ctx.strokeStyle = borderColor;
+            ctx.strokeRect(boxX, boxY, shapeWidth, shapeHeight);
+        }        
+	} else if (opts.backgroundShape === 'rectangle') {
+        const boxX = x - shapeWidth / 2;
+        const boxY = y - shapeHeight / 2;
+    
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
+        if (borderWidth > 0) {
+            ctx.lineWidth = borderWidth;
+            ctx.strokeStyle = borderColor;
+            ctx.strokeRect(boxX, boxY, shapeWidth, shapeHeight);
+        }
+    }
+    
 	ctx.fillStyle = opts.color;
 	ctx.globalAlpha = opts.opacity ?? 1;
 	ctx.fillText(opts.text, x, y);

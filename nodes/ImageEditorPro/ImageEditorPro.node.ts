@@ -129,6 +129,32 @@ export class ImageEditorPro implements INodeType {
 				default: '#000000',
 				displayOptions: { show: { mode: ['addText'], textBackgroundShape: ['circle', 'rectangle'] } },
 			},
+            {
+                displayName: 'Shape Width',
+                name: 'shapeWidth',
+                type: 'number',
+                default: 100,
+                description: 'The width of the background shape',
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['circle', 'rectangle', 'square'],
+                    },
+                },
+            },
+            {
+                displayName: 'Shape Height',
+                name: 'shapeHeight',
+                type: 'number',
+                default: 100,
+                description: 'The height of the background shape',
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['rectangle', 'square'],
+                    },
+                },
+            },                    
 			{
 				displayName: 'Position',
 				name: 'position',
@@ -179,72 +205,93 @@ export class ImageEditorPro implements INodeType {
 		],
 	};
 
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const mode = this.getNodeParameter('mode', 0) as EditorMode;
-		const imageUrlsStr = this.getNodeParameter('imageUrls', 0) as string;
-		const urls = imageUrlsStr
-			.split(',')
-			.map((u) => u.trim())
-			.filter(Boolean);
-
-		const binary = this.getInputData().find((item) => item.binary?.imageInput)?.binary?.imageInput;
-
-		if (!urls.length && !binary) {
-			throw new NodeOperationError(this.getNode(), 'Must provide either imageUrls or binary imageInput.');
-		}
-
-		const input: ImageEditorInput = { urls, binary };
-
-		let options: ImageEditorOptions;
-		if (mode === 'collage') {
-			options = {
-				rows: this.getNodeParameter('rows', 0) as number,
-				columns: this.getNodeParameter('columns', 0) as number,
-				spacing: this.getNodeParameter('spacing', 0) as number,
-				backgroundColor: this.getNodeParameter('backgroundColor', 0) as string,
-			};
-		} else if (mode === 'addText') {
-			const positionParam = this.getNodeParameter('position', 0) as string;
-			const position =
-				positionParam === 'custom'
-					? { x: this.getNodeParameter('customX', 0) as number, y: this.getNodeParameter('customY', 0) as number }
-					: (positionParam as AddTextOptions['position']);
-
-			options = {
-				text: this.getNodeParameter('text', 0) as string,
-				fontSize: this.getNodeParameter('fontSize', 0) as number,
-				color: this.getNodeParameter('color', 0) as string,
-				position,
-				opacity: this.getNodeParameter('opacity', 0) as number,
-				backgroundShape: this.getNodeParameter('textBackgroundShape', 0) as any,
-				backgroundColor: this.getNodeParameter('textBackgroundColor', 0) as string,
-				borderColor: this.getNodeParameter('textBorderColor', 0) as string,
-			};
-		} else {
-			const positionParam = this.getNodeParameter('position', 0) as string;
-			const position =
-				positionParam === 'custom'
-					? { x: this.getNodeParameter('customX', 0) as number, y: this.getNodeParameter('customY', 0) as number }
-					: (positionParam as AddWatermarkOptions['position']);
-
-			options = {
-				content: this.getNodeParameter('watermarkText', 0) as string,
-				position,
-				opacity: this.getNodeParameter('opacity', 0) as number,
-			};
-		}
-
-		const buffer = await imageEditor({ mode, input, options });
-
-		return [
-			[
-				{
-					json: {},
-					binary: {
-						data: await this.helpers.prepareBinaryData(buffer, 'output.png', 'image/png'),
-					},
-				},
-			],
-		];
-	}
+    async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+        const mode = this.getNodeParameter('mode', 0) as EditorMode;
+    
+        // Get string of URLs (comma-separated)
+        const imageUrlsStr = this.getNodeParameter('imageUrls', 0, '') as string;
+        const urls = imageUrlsStr
+            .split(',')
+            .map((u) => u.trim())
+            .filter((u) => /^https?:\/\//.test(u));
+    
+        // Try to get binary input if available
+        const binaryInput = this.getInputData().find((item) => item.binary?.imageInput)?.binary?.imageInput;
+    
+        // Throw error if neither URL nor binary was provided
+        if (!urls.length && !binaryInput) {
+            throw new NodeOperationError(this.getNode(), 'Must provide either image URLs or binary image input.');
+        }
+    
+        // Normalize the input
+        const input: ImageEditorInput = {
+            urls,
+            binary: binaryInput ?? undefined,
+        };
+    
+        let options: ImageEditorOptions;
+    
+        if (mode === 'collage') {
+            options = {
+                rows: this.getNodeParameter('rows', 0) as number,
+                columns: this.getNodeParameter('columns', 0) as number,
+                spacing: this.getNodeParameter('spacing', 0) as number,
+                backgroundColor: this.getNodeParameter('backgroundColor', 0) as string,
+            };
+        } else if (mode === 'addText') {
+            const positionParam = this.getNodeParameter('position', 0) as string;
+            const position =
+                positionParam === 'custom'
+                    ? {
+                            x: this.getNodeParameter('customX', 0) as number,
+                            y: this.getNodeParameter('customY', 0) as number,
+                      }
+                    : (positionParam as AddTextOptions['position']);
+    
+            options = {
+                text: this.getNodeParameter('text', 0) as string,
+                fontSize: this.getNodeParameter('fontSize', 0) as number,
+                color: this.getNodeParameter('color', 0) as string,
+                position,
+                opacity: this.getNodeParameter('opacity', 0) as number,
+                backgroundShape: this.getNodeParameter('textBackgroundShape', 0) as 'circle' | 'rectangle' | 'square' | 'none' | undefined,
+                backgroundColor: this.getNodeParameter('textBackgroundColor', 0) as string,
+                borderColor: this.getNodeParameter('textBorderColor', 0) as string,
+                shapeWidth: this.getNodeParameter('shapeWidth', 0) as number,
+                shapeHeight: this.getNodeParameter('shapeHeight', 0) as number,
+            };
+                    
+        } else {
+            // watermark mode
+            const positionParam = this.getNodeParameter('position', 0) as string;
+            const position =
+                positionParam === 'custom'
+                    ? {
+                            x: this.getNodeParameter('customX', 0) as number,
+                            y: this.getNodeParameter('customY', 0) as number,
+                      }
+                    : (positionParam as AddWatermarkOptions['position']);
+    
+            options = {
+                content: this.getNodeParameter('watermarkText', 0) as string,
+                position,
+                opacity: this.getNodeParameter('opacity', 0) as number,
+            };
+        }
+    
+        // Run the main image editor logic
+        const buffer = await imageEditor({ mode, input, options });
+    
+        return [
+            [
+                {
+                    json: {},
+                    binary: {
+                        data: await this.helpers.prepareBinaryData(buffer, 'output.png', 'image/png'),
+                    },
+                },
+            ],
+        ];
+    }
+    
 }
