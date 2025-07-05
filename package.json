@@ -11,7 +11,7 @@
     "canvas",
     "sharp"
   ],
-  "main": "nodes/ImageEditorPro/AliExpressAffiliate.node.js",
+  "main": "nodes/ImageEditorPro/ImageEditorPro.node.js",
   "scripts": {
     "build": "tsc && gulp build:icons",
     "lint": "eslint nodes credentials --ext .ts --fix",
@@ -46,6 +46,9 @@
     "@types/node": "^20.11.30",
     "eslint": "^9.30.1",
     "typescript": "^5.4.3"
+  },
+  "peerDependencies": {
+    "canvas": "^2.11.2"
   },
   "files": [
     "dist",
