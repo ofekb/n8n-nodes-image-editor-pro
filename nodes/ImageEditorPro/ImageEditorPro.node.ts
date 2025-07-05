@@ -143,6 +143,19 @@ export class ImageEditorPro implements INodeType {
                 },
             },
             {
+                displayName: 'Shape Padding',
+                name: 'shapePadding',
+                type: 'number',
+                default: 20,
+                description: 'Padding (in pixels) between the shape border and the text',
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['circle', 'rectangle', 'square'],
+                    },
+                },
+            },            
+            {
                 displayName: 'Shape Height',
                 name: 'shapeHeight',
                 type: 'number',
@@ -239,6 +252,12 @@ export class ImageEditorPro implements INodeType {
                 backgroundColor: this.getNodeParameter('backgroundColor', 0) as string,
             };
         } else if (mode === 'addText') {
+            const shape = this.getNodeParameter('textBackgroundShape', 0) as 'circle' | 'rectangle' | 'square' | 'none';
+            const shapeWidth = this.getNodeParameter('shapeWidth', 0) as number;
+            const shapeHeight = ['rectangle', 'square'].includes(shape)
+                ? (this.getNodeParameter('shapeHeight', 0) as number)
+                : undefined;
+            const shapePadding = this.getNodeParameter('shapePadding', 0) as number;
             const positionParam = this.getNodeParameter('position', 0) as string;
             const position =
                 positionParam === 'custom'
@@ -254,12 +273,14 @@ export class ImageEditorPro implements INodeType {
                 color: this.getNodeParameter('color', 0) as string,
                 position,
                 opacity: this.getNodeParameter('opacity', 0) as number,
-                backgroundShape: this.getNodeParameter('textBackgroundShape', 0) as 'circle' | 'rectangle' | 'square' | 'none' | undefined,
+                backgroundShape: shape,
                 backgroundColor: this.getNodeParameter('textBackgroundColor', 0) as string,
                 borderColor: this.getNodeParameter('textBorderColor', 0) as string,
-                shapeWidth: this.getNodeParameter('shapeWidth', 0) as number,
-                shapeHeight: this.getNodeParameter('shapeHeight', 0) as number,
+                shapeWidth,
+                shapeHeight,
+                shapePadding,
             };
+                    
                     
         } else {
             // watermark mode

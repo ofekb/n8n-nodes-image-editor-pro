@@ -48,8 +48,9 @@ export interface AddTextOptions {
 	backgroundColor?: string;
 	borderColor?: string;
 	borderWidth?: number;
-    shapeWidth?: number;
-    shapeHeight?: number;
+	shapeWidth?: number;
+	shapeHeight?: number;
+	shapePadding?: number;
 }
 
 /**

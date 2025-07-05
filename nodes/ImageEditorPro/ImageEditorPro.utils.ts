@@ -114,10 +114,10 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 	}
 
 
-	const padding = 20;
+	const padding = opts.shapePadding ?? 20;
     const shapeWidth = opts.shapeWidth ?? ctx.measureText(opts.text).width + padding;
     const shapeHeight = opts.shapeHeight ?? opts.fontSize + padding;
-    const radius = Math.max(shapeWidth, shapeHeight) / 2;
+    const radius = Math.max(shapeWidth, shapeHeight) / 2;    
 	const bgColor = opts.backgroundColor || 'rgba(255,255,255,0.5)';
 	const borderWidth = opts.borderWidth ?? 0;
 	const borderColor = opts.borderColor || 'transparent';
@@ -135,6 +135,8 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 	} else if (opts.backgroundShape === 'square') {
         const boxX = x - shapeWidth / 2;
         const boxY = y - shapeHeight / 2;
+        ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
+
         
         ctx.fillStyle = bgColor;
         ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
@@ -146,6 +148,8 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 	} else if (opts.backgroundShape === 'rectangle') {
         const boxX = x - shapeWidth / 2;
         const boxY = y - shapeHeight / 2;
+        ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
+
     
         ctx.fillStyle = bgColor;
         ctx.fillRect(boxX, boxY, shapeWidth, shapeHeight);
