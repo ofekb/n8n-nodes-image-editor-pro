@@ -21,9 +21,14 @@ export async function imageEditor({
 }): Promise<Buffer> {
 	const images: Buffer[] = [];
 
-	if (input.binary) {
+    if (input.binaryArray?.length) {
+		for (const binary of input.binaryArray) {
+			images.push(Buffer.from(binary.data, 'base64'));
+		}
+	} else if (input.binary) {
 		images.push(Buffer.from(input.binary.data, 'base64'));
 	}
+    
 
 	for (const url of input.urls ?? []) {
 		const res = await axios.get(url, { responseType: 'arraybuffer' });

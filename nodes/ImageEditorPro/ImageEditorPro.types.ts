@@ -9,9 +9,11 @@ export type EditorMode = 'collage' | 'addText' | 'addWatermark';
  * Input to the image editor – either URLs or binary image data.
  */
 export interface ImageEditorInput {
-	urls: string[];             // Optional image URLs
-	binary?: IBinaryData;       // Optional binary image input
+	urls: string[];               // Optional image URLs
+	binary?: IBinaryData;         // Optional single binary
+	binaryArray?: IBinaryData[];  // Optional multiple binaries
 }
+
 
 /**
  * Coordinates or preset positions for overlay placement.

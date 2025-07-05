@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeOperationError,
 	NodeConnectionType,
+    IBinaryData,
 } from 'n8n-workflow';
 import { imageEditor } from './ImageEditorPro.utils';
 import {
@@ -276,19 +277,28 @@ export class ImageEditorPro implements INodeType {
         
     
         // Try to get binary input if available
-        const binaryInput = this.getInputData().find((item) => item.binary?.imageInput)?.binary?.imageInput;
+        const inputItems = this.getInputData();
+
+        const binaryArray = inputItems
+        .map((item) => item.binary?.data)
+        .filter((b): b is IBinaryData => b !== undefined);
     
+        const binary = binaryArray.length === 1 ? binaryArray[0] : undefined;
+        
         // Throw error if neither URL nor binary was provided
-        if (!urls.length && !binaryInput) {
+        if (urls.length === 0 && binaryArray.length === 0) {
             throw new NodeOperationError(this.getNode(), 'Must provide either image URLs or binary image input.');
         }
     
+        
         // Normalize the input
         const input: ImageEditorInput = {
             urls,
-            binary: binaryInput ?? undefined,
+            binary,
+            binaryArray: binaryArray.length > 1 ? binaryArray : undefined,
         };
-    
+        
+        
         let options: ImageEditorOptions;
     
         if (mode === 'collage') {

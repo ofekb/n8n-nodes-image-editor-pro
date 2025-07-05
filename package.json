@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-image-editor-pro",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Advanced image editing node for n8n using Sharp and Canvas",
   "keywords": [
     "n8n-community-node-package",
