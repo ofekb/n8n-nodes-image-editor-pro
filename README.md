@@ -36,7 +36,7 @@ Before installing this node, make sure the following system packages are install
 ```bash
 sudo apt update
 sudo apt install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++
-
+```
 ### 2. Clone / Download
 
 ```bash
@@ -44,3 +44,4 @@ git clone https://github.com/YOUR_USERNAME/n8n-nodes-image-editor-pro.git
 cd n8n-nodes-image-editor-pro
 npm install
 npm run build
+```
