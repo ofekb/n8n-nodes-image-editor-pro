@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-image-editor-pro",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Advanced image editing node for n8n using Sharp and Canvas",
   "keywords": [
     "n8n-community-node-package",
@@ -18,7 +18,8 @@
     "prepublishOnly": "npm run build",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lintfix": "eslint nodes credentials package.json --fix"
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "postinstall": "cd node_modules/canvas && npm install --build-from-source"
   },
   "n8n": {
     "n8nNodesApiVersion": 1,
@@ -47,6 +48,7 @@
     "typescript": "^5.4.3"
   },
   "files": [
-    "dist"
+    "dist",
+    "nodes"
   ]
 }
