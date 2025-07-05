@@ -267,11 +267,13 @@ export class ImageEditorPro implements INodeType {
         const mode = this.getNodeParameter('mode', 0) as EditorMode;
     
         // Get string of URLs (comma-separated)
-        const imageUrlsStr = this.getNodeParameter('imageUrls', 0, '') as string;
+        const imageUrlsRaw = this.getNodeParameter('imageUrls', 0, '') as unknown;
+        const imageUrlsStr = typeof imageUrlsRaw === 'string' ? imageUrlsRaw : '';
         const urls = imageUrlsStr
-            .split(',')
-            .map((u) => u.trim())
-            .filter((u) => /^https?:\/\//.test(u));
+          .split(',')
+          .map((u) => u.trim())
+          .filter((u) => /^https?:\/\//.test(u));
+        
     
         // Try to get binary input if available
         const binaryInput = this.getInputData().find((item) => item.binary?.imageInput)?.binary?.imageInput;
