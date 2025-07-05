@@ -167,7 +167,52 @@ export class ImageEditorPro implements INodeType {
                         textBackgroundShape: ['rectangle', 'square'],
                     },
                 },
-            },                    
+            },   
+            {
+                displayName: 'Text Alignment in Shape',
+                name: 'textAlignInShape',
+                type: 'options',
+                default: 'center',
+                description: 'Position of the text within the background shape',
+                options: [
+                    { name: 'Top', value: 'top' },
+                    { name: 'Center', value: 'center' },
+                    { name: 'Bottom', value: 'bottom' },
+                    { name: 'Custom', value: 'custom' },
+                ],
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['circle', 'rectangle', 'square'],
+                    },
+                },
+            },
+            {
+                displayName: 'Text X Offset (inside shape)',
+                name: 'textOffsetX',
+                type: 'number',
+                default: 0,
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['circle', 'rectangle', 'square'],
+                        textAlignInShape: ['custom'],
+                    },
+                },
+            },
+            {
+                displayName: 'Text Y Offset (inside shape)',
+                name: 'textOffsetY',
+                type: 'number',
+                default: 0,
+                displayOptions: {
+                    show: {
+                        mode: ['addText'],
+                        textBackgroundShape: ['circle', 'rectangle', 'square'],
+                        textAlignInShape: ['custom'],
+                    },
+                },
+            },                             
 			{
 				displayName: 'Position',
 				name: 'position',
@@ -259,6 +304,10 @@ export class ImageEditorPro implements INodeType {
                 : undefined;
             const shapePadding = this.getNodeParameter('shapePadding', 0) as number;
             const positionParam = this.getNodeParameter('position', 0) as string;
+            const textAlignInShape = this.getNodeParameter('textAlignInShape', 0) as 'center' | 'top' | 'bottom' | 'custom';
+            const textOffsetX = textAlignInShape === 'custom' ? (this.getNodeParameter('textOffsetX', 0) as number) : undefined;
+            const textOffsetY = textAlignInShape === 'custom' ? (this.getNodeParameter('textOffsetY', 0) as number) : undefined;
+
             const position =
                 positionParam === 'custom'
                     ? {
@@ -279,6 +328,10 @@ export class ImageEditorPro implements INodeType {
                 shapeWidth,
                 shapeHeight,
                 shapePadding,
+                textAlignInShape,
+                textOffsetX,
+                textOffsetY,
+
             };
                     
                     

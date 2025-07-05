@@ -89,6 +89,8 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 	let x = 0;
 	let y = 0;
 
+    
+
 	if (typeof opts.position === 'string') {
 		switch (opts.position) {
 			case 'top-left':
@@ -121,6 +123,26 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
 	const bgColor = opts.backgroundColor || 'rgba(255,255,255,0.5)';
 	const borderWidth = opts.borderWidth ?? 0;
 	const borderColor = opts.borderColor || 'transparent';
+
+    let textX = x;
+    let textY = y;
+
+    switch (opts.textAlignInShape) {
+        case 'top':
+            textY = y - shapeHeight / 2 + opts.fontSize;
+            break;
+        case 'bottom':
+            textY = y + shapeHeight / 2 - opts.fontSize / 2;
+            break;
+        case 'center':
+            textY = y;
+            ctx.textBaseline = 'middle';
+            break;
+        case 'custom':
+            textX += opts.textOffsetX ?? 0;
+            textY += opts.textOffsetY ?? 0;
+            break;
+    }
 
 	if (opts.backgroundShape === 'circle') {
         ctx.beginPath();
@@ -162,7 +184,7 @@ async function addText(image: Buffer, opts: AddTextOptions): Promise<Buffer> {
     
 	ctx.fillStyle = opts.color;
 	ctx.globalAlpha = opts.opacity ?? 1;
-	ctx.fillText(opts.text, x, y);
+	ctx.fillText(opts.text, textX, textY);
 
 	return canvas.toBuffer('image/png');
 }

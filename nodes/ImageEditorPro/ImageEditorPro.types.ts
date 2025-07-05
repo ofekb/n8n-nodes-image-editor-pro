@@ -51,6 +51,9 @@ export interface AddTextOptions {
 	shapeWidth?: number;
 	shapeHeight?: number;
 	shapePadding?: number;
+    textAlignInShape?: 'center' | 'top' | 'bottom' | 'custom';
+    textOffsetX?: number;
+    textOffsetY?: number;
 }
 
 /**
