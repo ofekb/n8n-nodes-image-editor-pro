@@ -8,7 +8,7 @@ import {
 	ImageEditorInput,
 	ImageEditorOptions,
 } from './ImageEditorPro.types';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 export async function imageEditor({
 	mode,
