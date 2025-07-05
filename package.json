@@ -1,0 +1,33 @@
+{
+  "name": "n8n-nodes-image-editor-pro",
+  "version": "1.0.0",
+  "description": "Advanced image editing node for n8n using Sharp and Canvas",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "n8n",
+    "workflow",
+    "image",
+    "editor",
+    "canvas",
+    "sharp"
+  ],
+  "author": "Ofek Ben Harosh",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "canvas": "^2.11.2",
+    "n8n-workflow": "^1.82.0",
+    "sharp": "^0.33.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.3"
+  },
+  "files": [
+    "dist"
+  ]
+}
